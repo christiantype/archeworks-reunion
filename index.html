@@ -387,20 +387,29 @@
     }
   }
 
-  /* Subtle responsive */
+  /* Subtle responsive — keep the two-corner structure on mobile, just
+     narrower. Left column sizes to its content (Reunion / Get Updates),
+     right column takes the rest (date / organizers / contact). */
   @media (max-width: 720px) {
     body {
-      grid-template-columns: 1fr;
-      grid-template-rows: auto auto 1fr auto auto;
-      padding: 24px;
+      grid-template-columns: auto 1fr;
+      grid-template-rows: auto 1fr auto;
+      padding: 22px;
     }
     .top-center { grid-column: 1; grid-row: 1; text-align: left; }
-    .top-right  { grid-column: 1; grid-row: 2; text-align: left; }
-    /* Stay perfectly centered on the viewport even on mobile. */
-    .mark-wrap  { /* absolute positioning carries over */ }
-    .mark       { width: clamp(180px, 60vw, 320px); }
-    .bottom-left  { grid-column: 1; grid-row: 4; }
-    .bottom-right { grid-column: 1; grid-row: 5; align-items: flex-start; text-align: left; margin-top: 20px; }
+    .top-right  { grid-column: 2; grid-row: 1; text-align: right; }
+    .mark       { width: clamp(170px, 56vw, 300px); }
+    .bottom-left  { grid-column: 1; grid-row: 3; align-self: end; }
+    .bottom-right {
+      grid-column: 2;
+      grid-row: 3;
+      align-self: end;
+      align-items: flex-end;
+      text-align: right;
+      margin-top: 0;
+    }
+    /* keep the long email from overflowing the narrow right column */
+    .contact { font-size: 11px; }
   }
 </style>
 </head>
