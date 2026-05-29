@@ -5,7 +5,7 @@
  * submission as a row in this spreadsheet.
  *
  * SETUP (one time):
- *  1. Create a Google Sheet. In row 1 add headers: Timestamp | Name | Email
+ *  1. Create a Google Sheet. In row 1 add headers: Timestamp | First Name | Last Name | Email
  *  2. Extensions → Apps Script. Delete any boilerplate, paste this whole file.
  *  3. Click Deploy → New deployment.
  *       - Type: Web app
@@ -29,8 +29,9 @@ function doPost(e) {
     var params = (e && e.parameter) ? e.parameter : {};
     sheet.appendRow([
       new Date(),
-      params.name  || '',
-      params.email || ''
+      params.firstName || '',
+      params.lastName  || '',
+      params.email     || ''
     ]);
 
     return ContentService
