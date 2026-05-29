@@ -1,0 +1,9 @@
+# Build artifacts
+_deploy/
+arche-works-site.zip
+
+# Stray empty file
+/Archeworks
+
+# OS cruft
+.DS_Store

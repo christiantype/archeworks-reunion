@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Archeworks Alumni Reunion — September 14, 2026</title>
+<style>
+  /* Untitled Sans fallback stack — swap for real Klim files in production.
+     Montserrat 700 is loaded only for the Colere wordmark, which is set
+     in Montserrat on colererd.com. */
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Montserrat:wght@700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    background: #ffffff;
+    color: #000000;
+    font-family: 'Untitled Sans', 'Inter', -apple-system, sans-serif;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    grid-template-rows: auto 1fr auto;
+    padding: 32px 40px;
+    position: relative;
+  }
+
+  /* Top row — tagline + date */
+  .top-left {
+    grid-column: 1;
+    grid-row: 1;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .top-right {
+    grid-column: 3;
+    grid-row: 1;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: right;
+  }
+
+  .top-center {
+    grid-column: 1;
+    grid-row: 1;
+    font-size: 13px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-align: left;
+    font-weight: 500;
+  }
+
+  /* The mark — pulled out of the grid so it sits dead-center on the viewport,
+     not biased upward by the taller bottom row. */
+  .mark-wrap {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  /* The mark is an inline SVG with the radial gradient baked in.
+     The pulse is driven by <animate> on the gradient's r attribute.
+     A two-stop drop-shadow gives it lift off the white field. */
+  .mark {
+    display: block;
+    width: clamp(220px, 32vw, 420px);
+    height: auto;
+    filter:
+      drop-shadow(0 26px 44px rgba(0, 0, 0, 0.06))
+      drop-shadow(0 8px 14px rgba(0, 0, 0, 0.04));
+    will-change: transform, opacity, filter;
+  }
+
+  /* Bottom row — signup + organizers.
+     Both columns bottom-align to the page footer so the form's underline
+     and the contact email share a baseline, regardless of how tall the
+     right column gets. */
+  .bottom-left {
+    grid-column: 1;
+    grid-row: 3;
+    align-self: end;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 340px;
+  }
+
+  .signup-label {
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #000;
+  }
+
+  /* Trigger sits in bottom-left where the form used to live. */
+  .trigger-button {
+    align-self: flex-start;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #000;
+    cursor: pointer;
+    padding: 8px 0 6px;
+    border-bottom: 1px solid #000;
+    transition: opacity 0.3s ease;
+  }
+
+  .trigger-button:hover { opacity: 0.5; }
+
+  /* Overlay — frosted white field, so the modal emerges from the page
+     rather than landing on top of a dark "trap" backdrop. */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.86);
+    -webkit-backdrop-filter: blur(18px);
+            backdrop-filter: blur(18px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.45s ease;
+  }
+
+  .modal-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .modal {
+    position: relative;
+    background: #fff;
+    border: 1px solid #000;
+    padding: 44px 40px 36px;
+    width: 90%;
+    max-width: 440px;
+    transform: translateY(16px);
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .modal-backdrop.open .modal { transform: translateY(0); }
+
+  .modal-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    color: #000;
+    padding: 6px;
+    transition: opacity 0.3s ease;
+  }
+
+  .modal-close:hover { opacity: 0.5; }
+
+  .modal h2 {
+    font-size: 13px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+
+  .modal-blurb {
+    font-size: 13px;
+    line-height: 1.55;
+    color: #555;
+    margin-bottom: 26px;
+  }
+
+  /* Reused field styles — two stacked rows, each with its own underline. */
+  .signup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .signup-form .field {
+    display: flex;
+    align-items: baseline;
+    border-bottom: 1px solid #000;
+    padding-bottom: 6px;
+  }
+
+  .signup-form input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 15px;
+    color: #000;
+    padding: 4px 0;
+    min-width: 0;
+  }
+
+  .signup-form .submit-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 18px;
+  }
+
+  .signup-form input::placeholder {
+    color: #999;
+    font-style: normal;
+  }
+
+  .signup-form button {
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: #000;
+    padding: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .signup-form button:hover { opacity: 0.5; }
+
+  .bottom-right {
+    grid-column: 3;
+    grid-row: 3;
+    align-self: end;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-items: flex-end;
+    text-align: right;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+  }
+
+  .bottom-right .label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #999;
+  }
+
+  /* Three organizer marks, stacked vertically and locked to the same width
+     so they read as a coherent set of logotypes rather than three different
+     brand executions. */
+  .organizers {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 14px;
+  }
+
+  /* Each logo is sized so its letterform cap-height lands at ~22px —
+     not the bounding boxes, the actual visible letters. The star/sun
+     icons inside Daylight and DIB take different amounts of vertical
+     space, so the image heights aren't the same number even though the
+     letterforms read at the same size. */
+  .logo {
+    display: block;
+    height: auto;
+    width: auto;
+    object-fit: contain;
+  }
+
+  /* Colere — Montserrat 700 uppercase with wide tracking,
+     matching the wordmark as it appears on colererd.com. */
+  .logo-colere {
+    font-family: 'Montserrat', 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    line-height: 1;
+    text-transform: uppercase;
+    color: #000000; /* flyer black — matches the AW logo PDF (0 0 0 rg) */
+    /* trim the trailing tracking gap so the right edge optically aligns
+       with the image marks above/below it */
+    margin-right: -0.22em;
+  }
+
+  /* Daylight image is mostly letterforms — height ≈ cap height + descender.
+     DIB image is dominated by its tall 10-point star icon, so the image
+     needs more total height to land the letters at the same visual size. */
+  .logo-daylight { height: 22px; }
+
+  /* DIB image has ~29% transparent padding above and below its content
+     (verified via imagemagick trim). Negative margins crop that whitespace
+     so the gaps above and below DIB match the rest of the column. */
+  .logo-dib {
+    height: 36px;
+    margin-top: -10px;
+    margin-bottom: -10px;
+  }
+
+  .contact {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 4px;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+  }
+
+  .contact a {
+    color: #000;
+    text-decoration: none;
+    border-bottom: 1px solid #000;
+    padding-bottom: 1px;
+    transition: opacity 0.3s ease;
+  }
+
+  .contact a:hover { opacity: 0.5; }
+
+  /* Fade-in on load — single orchestrated reveal */
+  .top-left, .top-center, .top-right, .bottom-left, .bottom-right {
+    opacity: 0;
+    animation: fadeIn 1.4s ease-out forwards;
+  }
+
+  .mark {
+    opacity: 0;
+    /* Long, decelerating entrance, then a perpetual gentle hover.
+       The hover begins after the entrance lands so they don't fight. */
+    animation:
+      fadeInMark 2.6s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards,
+      markHover  7s   ease-in-out                   3.4s infinite;
+  }
+
+  .top-left   { animation-delay: 0.2s; }
+  .top-center { animation-delay: 0.25s; }
+  .top-right  { animation-delay: 0.3s; }
+  .bottom-left  { animation-delay: 0.7s; }
+  .bottom-right { animation-delay: 0.8s; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeInMark {
+    from {
+      opacity: 0;
+      transform: translateY(28px) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* Perpetual breath — the mark rises ~9px and back over 7s, and the
+     drop-shadow expands as it lifts so the lift reads physically. */
+  @keyframes markHover {
+    0%, 100% {
+      transform: translateY(0) scale(1);
+      filter:
+        drop-shadow(0 26px 44px rgba(0, 0, 0, 0.06))
+        drop-shadow(0 8px 14px rgba(0, 0, 0, 0.04));
+    }
+    50% {
+      transform: translateY(-9px) scale(1);
+      filter:
+        drop-shadow(0 36px 58px rgba(0, 0, 0, 0.05))
+        drop-shadow(0 12px 20px rgba(0, 0, 0, 0.035));
+    }
+  }
+
+  /* Subtle responsive */
+  @media (max-width: 720px) {
+    body {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto 1fr auto auto;
+      padding: 24px;
+    }
+    .top-center { grid-column: 1; grid-row: 1; text-align: left; }
+    .top-right  { grid-column: 1; grid-row: 2; text-align: left; }
+    /* Stay perfectly centered on the viewport even on mobile. */
+    .mark-wrap  { /* absolute positioning carries over */ }
+    .mark       { width: clamp(180px, 60vw, 320px); }
+    .bottom-left  { grid-column: 1; grid-row: 4; }
+    .bottom-right { grid-column: 1; grid-row: 5; align-items: flex-start; text-align: left; margin-top: 20px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="top-center">Reunion</div>
+  <div class="top-right">2026.09.14 — Chicago — 4–9pm</div>
+
+  <div class="mark-wrap">
+    <svg class="mark" viewBox="0 0 1080 1080" role="img" aria-label="Archeworks" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#000000" d="M516.2,134.1v118h-150.9v-111.6h29.3v73.7h27.6v-68.8h29.3v68.8h35.6v-80.1M516.2,425.7h-150.9v-37.9h54.3v-56.5h-54.3v-37.9h150.9v37.9h-63.6v56.5h63.6v37.9ZM400.4,461.6l15.1,30.2c-14,5.3-22.7,18.3-22.7,31.5,0,20.9,14,37.5,47.9,37.5s47.9-8.9,47.9-38.8-7.6-25.1-21.2-31.1l14.4-30c23.5,13,38.6,35.6,38.6,61.2,0,48.4-37.3,76.7-79.7,76.7s-79.7-26.4-79.7-73.7,14.4-49.4,39.4-63.5M516.2,765h-150.9v-75.9c0-34.1,15.7-55,49.6-55s35.2,12.4,40.7,31.3l60.6-34.7v42.4l-54.3,29.8v24.1h54.3v37.9ZM393.2,727.1h40.7v-34.7c-.2-12.1-6.4-20.2-20.3-20.2s-20.1,8.1-20.4,20.2v34.7ZM464.4,888.8v-37.9l-62.3,18.7v.4l62.3,18.7ZM516.2,945.9l-150.9-56v-39.2l150.9-57.3v40.7l-23.7,7.7v56l23.7,7.7v40.5Z"/>
+      <path fill="#000000" d="M613.1,783.4l15.4,23.9c-9.8,10.9-15.5,21.2-15.5,36.1s3.5,23.3,14.3,23.3,9.4-4.7,11-14l4.2-26c3.7-23.2,15.9-35.8,34.2-35.8,30,0,42.4,24.4,42.4,51s-8.4,41-23.9,55.1l-16.9-23.7c9.9-8.2,15.7-20.4,15.7-33.5s-4.5-17.7-12.6-17.7-10,5.4-11.9,17.4l-1.9,11.9c-4,24.9-11.7,45.4-35.4,45.4-37.3,0-44.3-33.9-44.3-57.2s6.8-39.3,25.3-56.3M591.3,655.4h124.3v31.2h-49.6l49.6,44.7v41.4l-47.1-45.4-77.1,46.8v-34.7l55.2-34-19-18.8h-36.1v-31.2ZM591.3,509.3h124.3v62.4c0,28.1-12.9,45.3-40.8,45.3s-29-10.2-33.5-25.8l-49.9,28.6v-34.9l44.7-24.6v-19.8h-44.7v-31.2ZM692.5,540.5h-33.5v28.6c.2,10,5.2,16.7,16.8,16.7s16.6-6.7,16.8-16.7v-28.6ZM653.4,480.8c-34.9,0-65.6-23.3-65.6-63.1s30.7-63.1,65.6-63.1,65.6,23.3,65.6,63.1-30.7,63.1-65.6,63.1M653.4,449.6c19.5,0,39.4-8.8,39.4-31.9s-11.5-31.9-39.4-31.9-39.4,7.4-39.4,31.9,20.3,31.9,39.4,31.9M591.3,206.1l124.3-32.6v31.2l-88.7,18.8v.4l88.7,21.9v28.6l-88.7,22.8v.3l88.7,18.6v30.7l-124.3-32.3v-32.5l85-22.3v-.4l-85-22.1v-31.2Z"/>
+    </svg>
+  </div>
+
+  <div class="bottom-left">
+    <button class="trigger-button" type="button" data-open="signup">Get Updates</button>
+  </div>
+
+  <div class="modal-backdrop" data-modal="signup" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="signup-title">
+      <button class="modal-close" type="button" data-close="signup" aria-label="Close">✕</button>
+      <h2 id="signup-title">Get Updates</h2>
+      <p class="modal-blurb">Drop your name and email — we'll send reunion details as they come together.</p>
+      <form class="signup-form" id="signup-form">
+        <div class="field">
+          <input type="text" name="name" placeholder="name" required autocomplete="name" />
+        </div>
+        <div class="field">
+          <input type="email" name="email" placeholder="email" required autocomplete="email" />
+        </div>
+        <div class="submit-row">
+          <button type="submit">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      /* Paste your Apps Script Web App URL here (ends in /exec).
+         See apps-script.gs for how to create it. */
+      var ENDPOINT = 'PASTE_YOUR_APPS_SCRIPT_EXEC_URL_HERE';
+
+      var trigger  = document.querySelector('[data-open="signup"]');
+      var backdrop = document.querySelector('[data-modal="signup"]');
+      var close    = document.querySelector('[data-close="signup"]');
+      var form     = document.getElementById('signup-form');
+
+      function open() { backdrop.classList.add('open'); setTimeout(function(){ var i = backdrop.querySelector('input'); if (i) i.focus(); }, 350); }
+      function shut() { backdrop.classList.remove('open'); }
+
+      trigger.addEventListener('click', open);
+      close.addEventListener('click', shut);
+      backdrop.addEventListener('click', function(e) { if (e.target === backdrop) shut(); });
+      document.addEventListener('keydown', function(e) { if (e.key === 'Escape') shut(); });
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var btn = form.querySelector('button[type=submit]');
+        btn.disabled = true;
+        btn.textContent = 'Sending…';
+        /* no-cors: Apps Script accepts the POST but returns an opaque response.
+           The submission still lands in the Sheet; we just can't read the reply,
+           so we treat a completed request as success. */
+        fetch(ENDPOINT, { method: 'POST', mode: 'no-cors', body: new URLSearchParams(new FormData(form)) })
+          .then(function() {
+            btn.textContent = 'Thanks';
+            setTimeout(function() { shut(); form.reset(); btn.disabled = false; btn.textContent = 'Submit'; }, 1600);
+          })
+          .catch(function() {
+            btn.disabled = false;
+            btn.textContent = 'Try again';
+          });
+      });
+    })();
+  </script>
+
+  <div class="bottom-right">
+    <div class="label">Organized by</div>
+    <div class="organizers">
+      <span class="logo logo-colere">colere</span>
+      <img  class="logo logo-daylight" src="Assets/Daylight_logotype.png"  alt="Daylight" />
+      <img  class="logo logo-dib"      src="Assets/DIB_SiteLogo-Black.png" alt="Do It Better" />
+    </div>
+    <div class="contact">
+      <span class="label">Contact</span>
+      <a href="mailto:nicolette@doitbetterdesign.com">nicolette@doitbetterdesign.com</a>
+    </div>
+  </div>
+
+</body>
+</html>
