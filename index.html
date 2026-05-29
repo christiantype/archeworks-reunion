@@ -314,6 +314,18 @@
     margin-bottom: -10px;
   }
 
+  /* Logo links — inherit color (no blue/underline on the COLERE text);
+     flex wrapper preserves the per-logo margin calibration. */
+  .organizers .logo-link {
+    display: flex;
+    align-items: center;
+    color: inherit;
+    text-decoration: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .organizers .logo-link:hover { opacity: 0.5; }
+
   .contact {
     display: flex;
     flex-direction: column;
@@ -494,9 +506,15 @@
   <div class="bottom-right">
     <div class="label">Organized by</div>
     <div class="organizers">
-      <span class="logo logo-colere">colere</span>
-      <img  class="logo logo-daylight" src="Assets/Daylight_logotype.png"  alt="Daylight" />
-      <img  class="logo logo-dib"      src="Assets/DIB_SiteLogo-Black.png" alt="Do It Better" />
+      <a class="logo-link" href="https://colererd.com/" target="_blank" rel="noopener noreferrer" aria-label="Colere">
+        <span class="logo logo-colere">colere</span>
+      </a>
+      <a class="logo-link" href="https://wedaylight.org/" target="_blank" rel="noopener noreferrer" aria-label="Daylight">
+        <img class="logo logo-daylight" src="Assets/Daylight_logotype.png" alt="Daylight" />
+      </a>
+      <a class="logo-link" href="http://doitbetterdesign.com" target="_blank" rel="noopener noreferrer" aria-label="Do It Better">
+        <img class="logo logo-dib" src="Assets/DIB_SiteLogo-Black.png" alt="Do It Better" />
+      </a>
     </div>
     <div class="contact">
       <span class="label">Contact</span>
